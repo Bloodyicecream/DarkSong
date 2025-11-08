@@ -25,6 +25,9 @@
         }
         #qrcode { 
             margin: 20px auto; 
+            border: 1px solid #ddd;
+            padding: 10px;
+            display: inline-block;
         }
         .download-btn {
             display: inline-block;
@@ -35,6 +38,15 @@
             border-radius: 6px;
             margin: 10px;
             font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+        .qr-download {
+            background: #0366d6;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -51,19 +63,39 @@
             <a href="DarkSong.mp3" download class="download-btn">
                 📥 Скачать MP3
             </a>
+            <button onclick="downloadQR()" class="download-btn qr-download">
+                📷 Скачать QR-код
+            </button>
         </div>
         
+        <!-- Контейнер для QR-кода -->
         <div id="qrcode"></div>
         <p>Сканируйте QR-код для доступа к треку</p>
     </div>
     
     <script>
-        // QR-код для прямой ссылки на MP3
         const mp3Url = 'https://github.com/Bloodyicecream/DarkSong/raw/main/DarkSong.mp3';
+        
+        // Создаем QR-код на странице
         QRCode.toCanvas(document.getElementById('qrcode'), mp3Url, {
             width: 200,
-            margin: 2
+            margin: 2,
+            colorDark: "#000000",
+            colorLight: "#ffffff"
         });
+        
+        // Функция скачивания QR-кода
+        function downloadQR() {
+            QRCode.toDataURL(mp3Url, {
+                width: 400,
+                margin: 2
+            }, function (err, url) {
+                const link = document.createElement('a');
+                link.download = 'darksong-qr.png';
+                link.href = url;
+                link.click();
+            });
+        }
     </script>
 </body>
 </html>
