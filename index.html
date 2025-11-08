@@ -40,9 +40,16 @@
             font-weight: bold;
             border: none;
             cursor: pointer;
+            font-size: 14px;
         }
         .qr-download {
             background: #0366d6;
+        }
+        .mp3-download {
+            background: #6f42c1;
+        }
+        .loading {
+            background: #6c757d;
         }
     </style>
 </head>
@@ -59,15 +66,16 @@
             <a href="DarkSong.mp3" download class="download-btn">
                 📥 Скачать MP3
             </a>
-            <button onclick="downloadPageQR()" class="download-btn qr-download">
+            <button id="pageQRBtn" onclick="downloadPageQR()" class="download-btn qr-download">
                 📷 QR для страницы
             </button>
-            <button onclick="downloadMP3QR()" class="download-btn" style="background: #6f42c1;">
+            <button id="mp3QRBtn" onclick="downloadMP3QR()" class="download-btn mp3-download">
                 🔗 QR для MP3
             </button>
         </div>
         
         <div id="qrcode"></div>
+        <p>Текущий QR-код: <span id="currentQR">страницы</span></p>
         <p>Сканируйте QR-код для доступа к треку</p>
     </div>
     
@@ -75,42 +83,114 @@
         const pageUrl = 'https://bloodyicecream.github.io/DarkSong/';
         const mp3Url = 'https://github.com/Bloodyicecream/DarkSong/raw/main/DarkSong.mp3';
         
-        // По умолчанию показываем QR-код для страницы
-        showQRCode(pageUrl);
+        // Показываем QR-код для страницы по умолчанию
+        showQRCode(pageUrl, 'страницы');
         
-        function showQRCode(url) {
+        function showQRCode(url, type) {
             document.getElementById('qrcode').innerHTML = '';
+            document.getElementById('currentQR').textContent = type;
             QRCode.toCanvas(document.getElementById('qrcode'), url, {
                 width: 200,
-                margin: 2
+                margin: 2,
+                colorDark: '#000000',
+                colorLight: '#FFFFFF'
             });
         }
         
         // QR-код для СТРАНИЦЫ
         function downloadPageQR() {
-            QRCode.toDataURL(pageUrl, {
+            const button = document.getElementById('pageQRBtn');
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = '⏳ Генерируем...';
+            button.classList.add('loading');
+            
+            // Простой способ - создаем новый canvas и конвертируем
+            const canvas = document.createElement('canvas');
+            QRCode.toCanvas(canvas, pageUrl, {
                 width: 400,
-                margin: 2
-            }, function (err, url) {
-                const link = document.createElement('a');
-                link.download = 'darksong-page-qr.png';
-                link.href = url;
-                link.click();
+                margin: 2,
+                colorDark: '#000000',
+                colorLight: '#FFFFFF'
+            }, function (error) {
+                if (error) {
+                    console.error(error);
+                    button.innerHTML = originalText;
+                    button.classList.remove('loading');
+                    return;
+                }
+                
+                // Конвертируем canvas в изображение для скачивания
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.download = 'darksong-page-qr.png';
+                    link.href = url;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    
+                    button.innerHTML = originalText;
+                    button.classList.remove('loading');
+                });
             });
         }
         
         // QR-код для MP3 ФАЙЛА
         function downloadMP3QR() {
-            QRCode.toDataURL(mp3Url, {
+            const button = document.getElementById('mp3QRBtn');
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = '⏳ Генерируем...';
+            button.classList.add('loading');
+            
+            const canvas = document.createElement('canvas');
+            QRCode.toCanvas(canvas, mp3Url, {
                 width: 400,
-                margin: 2
-            }, function (err, url) {
-                const link = document.createElement('a');
-                link.download = 'darksong-mp3-qr.png';
-                link.href = url;
-                link.click();
+                margin: 2,
+                colorDark: '#000000',
+                colorLight: '#FFFFFF'
+            }, function (error) {
+                if (error) {
+                    console.error(error);
+                    button.innerHTML = originalText;
+                    button.classList.remove('loading');
+                    return;
+                }
+                
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.download = 'darksong-mp3-qr.png';
+                    link.href = url;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    
+                    button.innerHTML = originalText;
+                    button.classList.remove('loading');
+                });
             });
         }
+        
+        // Также добавим переключение отображаемого QR-кода
+        function switchToPageQR() {
+            showQRCode(pageUrl, 'страницы');
+        }
+        
+        function switchToMP3QR() {
+            showQRCode(mp3Url, 'MP3 файла');
+        }
     </script>
+    
+    <div style="text-align: center; margin-top: 20px;">
+        <small>
+            Показать QR-код для: 
+            <button onclick="switchToPageQR()" style="margin: 0 5px; padding: 5px 10px;">Страницы</button>
+            <button onclick="switchToMP3QR()" style="margin: 0 5px; padding: 5px 10px;">MP3 файла</button>
+        </small>
+    </div>
 </body>
 </html>
