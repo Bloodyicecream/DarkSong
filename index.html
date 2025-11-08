@@ -1,47 +1,69 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Скачать QR-код</title>
+    <title>DarkSong</title>
+    <meta charset="utf-8">
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin: 50px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        audio { 
+            width: 100%; 
+            margin: 20px 0; 
+        }
+        #qrcode { 
+            margin: 20px auto; 
+        }
+        .download-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #2ea44f;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 10px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <div style="text-align: center; margin: 50px;">
-        <h2>Скачать QR-код для DarkSong</h2>
-        <button onclick="generateQR()" style="padding: 15px 30px; font-size: 16px;">
-            🎵 Скачать QR-код
-        </button>
-        <p>После нажатия откроется диалог сохранения файла</p>
-    </div>
-
-    <script>
-        function generateQR() {
-            const url = 'https://bloodyicecream.github.io/DarkSong/';
-            
-            // Создаем временный canvas
-            const canvas = document.createElement('canvas');
-            
-            QRCode.toCanvas(canvas, url, {
-                width: 400,
-                margin: 2,
-                colorDark: '#000000',
-                colorLight: '#FFFFFF'
-            }, function (error) {
-                if (error) {
-                    alert('Ошибка генерации QR-кода');
-                    return;
-                }
-                
-                // Конвертируем в Data URL и скачиваем
-                const dataUrl = canvas.toDataURL('image/png');
-                const link = document.createElement('a');
-                link.download = 'DarkSong-QR.png';
-                link.href = dataUrl;
-                link.click();
-            });
-        }
+    <div class="container">
+        <h1>🎵 DarkSong</h1>
         
-        // Автозапуск при загрузке страницы
-        window.onload = generateQR;
+        <audio controls>
+            <source src="DarkSong.mp3" type="audio/mpeg">
+            Ваш браузер не поддерживает аудио элемент.
+        </audio>
+        
+        <div>
+            <a href="DarkSong.mp3" download class="download-btn">
+                📥 Скачать MP3
+            </a>
+        </div>
+        
+        <div id="qrcode"></div>
+        <p>Сканируйте QR-код для доступа к треку</p>
+    </div>
+    
+    <script>
+        // QR-код для прямой ссылки на MP3
+        const mp3Url = 'https://github.com/Bloodyicecream/DarkSong/raw/main/DarkSong.mp3';
+        QRCode.toCanvas(document.getElementById('qrcode'), mp3Url, {
+            width: 200,
+            margin: 2
+        });
     </script>
 </body>
 </html>
